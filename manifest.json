@@ -1,0 +1,21 @@
+{
+  "name": "Kirana Manager",
+  "short_name": "KiranaMgr",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#eef2f3",
+  "theme_color": "#2e7d32",
+  "description": "Manage your kirana store stocks, sales, profit, udhaar, and backup easily.",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
