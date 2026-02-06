@@ -1,107 +1,118 @@
 html {
-    scroll-behavior: smooth;
+  scroll-behavior: smooth;
 }
 
-*{
-    box-sizing: border-box;
+* {
+  box-sizing: border-box;
 }
+
 body {
   font-family: Arial, sans-serif;
   background: #eef2f3;
   padding: 0px 20px 20px 20px;
   margin: 0;
   position: relative;
-}
-header{
-    /* border: 1px solid black; */
-    width: 100%;
-    height: 70px;
-    padding: 0px 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: #2e7d32;
-}
-header h1{
-    /* border: 1px solid black; */
-    margin: 10px 0;
-}
-.menu-Icon{
-    /* border: 1px solid black; */
-    width: 40px;
-    height: 40px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 3px;
-}
-.menu-Icon span{
-    border: 1px solid black;
-    width: 95%;
-    height: 15%;
-    background: black; 
-    transition: all 0.3s ease; 
-}
-.open .icon1{
-    transform: rotate(45deg)translate(7px,8px);
-}
-.open .icon2{
-    opacity: -1;
-}
-.open .icon3{
-    transform: rotate(-45deg) translate(5px,-5px);
-}
-.menu-list{
-    /* border: 1px solid black; */
-    background: white;
-    position: fixed;
-    z-index: 999;
-    display: flex;
-    width: 160px;
-    height: 300px;
-    justify-content: center;
-    align-items: center;
-    top: 70px;
-    right: -170px;
-    box-shadow: -2px 2px 10px black;
-    transition: all 0.3s ease;                                                                                                                                                                   
-}
-.menu-list.show{
-    right: 10px;
-}
-.menu-list ul{
-    /* border: 1px solid black; */
-    width: 97%;
-    height: 98%;
-    margin: 0;
-    padding: 5px 0px 0px 0px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-.menu-list ul li{
-    list-style: none;
-    /* border: 1px solid black; */
-    width: 100%;
-    text-align: center;
-}
-.menu-list ul li a{
-    text-decoration: none;
-    color: black;
-    font-size: 12px;
-    font-weight: 500;
-    transition: 0.3s;
-}
-.menu-list ul li a:hover{
-    font-size:13px ;
-    color: blue;
+  overflow-x: hidden; /* FIX */
 }
 
-/* SECTION CARD */
+/* HEADER */
+header {
+  width: 100%;
+  height: 70px;
+  padding: 0px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: #2e7d32;
+}
+
+header h1 {
+  margin: 10px 0;
+}
+
+/* MENU ICON */
+.menu-Icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 3px;
+}
+
+.menu-Icon span {
+  width: 95%;
+  height: 15%;
+  background: black;
+  transition: all 0.3s ease;
+}
+
+.open .icon1 {
+  transform: rotate(45deg) translate(7px, 8px);
+}
+
+.open .icon2 {
+  opacity: 0;
+}
+
+.open .icon3 {
+  transform: rotate(-45deg) translate(5px, -5px);
+}
+
+/* MENU LIST */
+.menu-list {
+  background: white;
+  position: fixed;
+  z-index: 999;
+  display: flex;
+  width: 160px;
+  height: 300px;
+  justify-content: center;
+  align-items: center;
+  top: 70px;
+  right: -170px;
+  box-shadow: -2px 2px 10px black;
+  transition: all 0.3s ease;
+}
+
+.menu-list.show {
+  right: 10px;
+}
+
+.menu-list ul {
+  width: 97%;
+  height: 98%;
+  margin: 0;
+  padding: 5px 0 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.menu-list ul li {
+  list-style: none;
+  width: 100%;
+  text-align: center;
+}
+
+.menu-list ul li a {
+  text-decoration: none;
+  color: black;
+  font-size: 12px;
+  font-weight: 500;
+  transition: 0.3s;
+}
+
+.menu-list ul li a:hover {
+  font-size: 13px;
+  color: blue;
+}
+
+/* SECTION */
 section {
   background: #ffffff;
   padding: 15px;
@@ -109,6 +120,7 @@ section {
   border-radius: 6px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   scroll-margin-top: 80px;
+  overflow-x: auto; /* FIX */
 }
 
 /* INPUTS & BUTTONS */
@@ -118,7 +130,6 @@ button {
   margin: 5px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  box-sizing: border-box;
 }
 
 button {
@@ -136,6 +147,7 @@ button:hover {
 /* TABLE */
 table {
   width: 100%;
+  min-width: 600px; /* FIX */
   border-collapse: collapse;
   margin-top: 10px;
 }
@@ -146,9 +158,6 @@ td {
   padding: 6px;
   text-align: center;
   word-break: break-word;
-}
-#stockTable.openList{
-  display: none;
 }
 
 .low {
@@ -162,85 +171,71 @@ section button {
   width: calc(50% - 12px);
 }
 
-/* TOGGLE ARROW */
+/* TOGGLE */
 .toggle {
   cursor: pointer;
   float: right;
   font-size: 18px;
 }
-#stockListSection{
+
+#stockListSection,
+#udhaarSection,
+.hisListsec {
   max-height: 150px;
   width: 100%;
-  overflow-y: auto;
+  overflow: auto;
 }
 
-#udhaarSection{
-  /* border: 1px solid black; */
-  max-height: 150px;
-  width: 100%;
-  overflow-y: auto;
-  overflow-x: auto;
-}
-
-#paidAmountSec{
-  border: 1px solid black;
-  width: 200px;
+/* FIXED BOXES */
+#paidAmountSec,
+#delPersonSec {
+  width: 90%;
+  max-width: 300px;
   height: 150px;
   position: fixed;
   top: 180px;
-  right: 150px;
+  right: 50%;
+  transform: translateX(50%);
   display: none;
   transition: 0.3s ease;
 }
-#paidAmountSec.paid{
+
+#paidAmountSec.paid,
+#delPersonSec.del {
   display: block;
 }
 
-#delPersonSec{
-  border: 1px solid black;
-  width: 200px;
-  height: 150px;
-  position: fixed;
-  top: 180px;
-  right: 150px;
-  display: none;
-  transition: 0.3s ease;
-}
-#delPersonSec.del{
-  display: block;
-}
-
-.btnSec{
-  /* border: 1px solid black; */
+/* BUTTON SECTION */
+.btnSec {
   width: 100%;
   height: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
-  
 }
-.btnSec button{
+
+.btnSec button {
   width: 100px;
   height: 30px;
   margin: 0 5px;
 }
-#udhaarTable.show{
-  display: none;
-}
-#historySec{
-  border: 1px solid black;
+
+/* HISTORY POPUP */
+#historySec {
   position: fixed;
   top: 100px;
-  width: 98%;
-  left: 4px;
+  width: 95%;
+  left: 2.5%;
   z-index: 999;
   display: none;
 }
-#historySec.history{
+
+#historySec.history {
   display: block;
 }
-#closeHistory{
-  /* border: 1px solid black; */
+
+/* CLOSE ICON */
+#closeHistory {
   width: 20px;
   height: 20px;
   display: flex;
@@ -249,40 +244,62 @@ section button {
   justify-content: center;
   gap: 2px;
 }
-#closeHistory div{
+
+#closeHistory div {
   width: 98%;
   height: 20%;
-  border: 1px solid black;
   background: black;
 }
-#div1{
-  transform: rotate(45deg) translate(3px,2px);
+
+#div1 {
+  transform: rotate(45deg) translate(3px, 2px);
 }
-#div2{
-  transform: rotate(-45deg) translate(2px,-1px);
+
+#div2 {
+  transform: rotate(-45deg) translate(2px, -1px);
 }
-.hisListsec{
+
+/* POPUP */
+.popup {
+  display: none; /* FIX */
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 400px;
+  min-height: 150px;
+  z-index: 1000;
+  border-radius: 6px;
   border: 1px solid black;
-  width: 100%;
-  max-height: 300px;
-  overflow: auto;
+  justify-content: center;
+  align-items: center;
 }
 
+.popup.show {
+  display: flex;
+}
 
+.popup-content {
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 6px;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+}
 
-
-/* RESPONSIVE - DESKTOP */
+/* RESPONSIVE */
 @media (min-width: 600px) {
   section input,
   section button {
     width: calc(20% - 12px);
   }
-  .btnSec{
+  .btnSec {
     justify-content: left;
   }
 }
 
-/* RESPONSIVE - MOBILE */
 @media (max-width: 600px) {
   body {
     padding: 0px 10px 10px 10px;
@@ -299,49 +316,4 @@ section button {
     font-size: 14px;
     padding: 4px;
   }
-}
-
-/* LOW STOCK POPUP */
-.popup {
-  display: block;
-  position: fixed;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 400px;
-  min-height: 150px;
-  z-index: 1000;
-  border-radius: 6px;
-  border: 1px solid black;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-
-.popup-content {
-  background: #ffffff;
-  padding: 20px;
-  border-radius: 6px;
-  width:100%;
-  height: 100%;
-  text-align: center;
-}
-
-.popup-content ul {
-  text-align: left;
-  padding-left: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-.popup-content ul li {
-  list-style: none;
-  font-weight: 500;
-}
-
-.popup.lowitems{
-  display: none;
 }
