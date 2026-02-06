@@ -858,14 +858,14 @@ document.addEventListener("DOMContentLoaded",function(){
             if(amount >= item.profit){
                 netProfit += item.profit;
                 item.profit = 0;
+                store.put(item);
+                profitEl.innerText = "₹ " + netProfit;
             } else {
                 netProfit += amount;
                 item.profit -= amount;
+                store.put(item);
+                profitEl.innerText = "₹ " + netProfit;
             }
-
-            store.put(item);
-
-            profitEl.innerText = "₹ " + netProfit;
         };
     }
 
@@ -1000,7 +1000,3 @@ document.addEventListener("DOMContentLoaded",function(){
             });
         };
     }
-
-
-
-
