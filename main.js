@@ -1,29 +1,47 @@
-let request = indexedDB.open("MyKirana App", 13);
+//  Creating Database in indexdb 
+
+let request = indexedDB.open("MyKirana App", 1);
 let db;
 
 request.onupgradeneeded = (e) => {
     db = e.target.result;
 
+    // Stock inventory DB
     if(!db.objectStoreNames.contains("inventory")){
         db.createObjectStore("inventory",{keyPath: "name"});
     }
+
+    // Udhaar DB
     if(!db.objectStoreNames.contains("udhaar")){
         db.createObjectStore("udhaar",{keyPath : "name"});
     }
+
+    // Udhaar History DB
     if(!db.objectStoreNames.contains("udhaarHistory")){
         db.createObjectStore("udhaarHistory", {
         keyPath: "id",
         autoIncrement: true
         });
     }
+
+    // Daily Profit DB
     if(!db.objectStoreNames.contains("dailyProfit")){
         db.createObjectStore("dailyProfit",{keyPath : "date"});
     }
+
+    // Monthly Profit DB
     if(!db.objectStoreNames.contains("monthlyProfit")){
         db.createObjectStore("monthlyProfit",{keyPath : "month"});
     }
+
+    // Udhaar Profit DB
     if(!db.objectStoreNames.contains("udhaarProfit")){
         db.createObjectStore("udhaarProfit",{keyPath : "name"});
+    }
+
+    // NetProfit DB 
+    if(!db.objectStoreNames.contains("netProfit")){
+    db.createObjectStore("netProfit", { keyPath: "month" });
     }
    
 }
@@ -33,6 +51,17 @@ request.onsuccess = (e) => {
 };
 
 document.addEventListener("DOMContentLoaded",function(){
+
+    //  Toggle the Menu Icon
+    let menubtn = document.getElementById("menu_icon"); // getting menu baar .
+    let menulist = document.getElementById("menu_list"); // getting menu list.
+    let addbtn = document.getElementById('addStockBtn'); // btn for adding stocks.
+    menubtn.addEventListener("click",function(){ // toggle the menu baar.
+        menulist.classList.toggle("show");
+        menubtn.classList.toggle("open"); 
+    });
+
+
     let popupBtn = document.getElementById('closeLowStock');
     popupBtn.addEventListener('click',function(){
         let popUp = document.getElementById('lowStockPopup');
@@ -40,28 +69,17 @@ document.addEventListener("DOMContentLoaded",function(){
     })
 
 
-    let menubtn = document.getElementById("menu_icon"); // getting menu baar .
-    let menulist = document.getElementById("menu_list"); // getting menu list.
-    let addbtn = document.getElementById('addStockBtn'); // btn for adding stocks.
-    
-    menubtn.addEventListener("click",function(){ // toggle the menu baar.
-        menulist.classList.toggle("show");
-        menubtn.classList.toggle("open");
-        
-    });
-
     // Adding stocks  function.
     addbtn.addEventListener('click',function(){
         addStock();
     });
 
-    // this function is for show and hide the list.
 
+    // This function is for show and hide the list.
     let stockList = document.getElementById('stockTable'); 
     let aroBtn = document.getElementById('toggle')
     let isOpen = false;
 
-    
     aroBtn.addEventListener('click',function(){
     
         if(isOpen === false){
@@ -76,8 +94,7 @@ document.addEventListener("DOMContentLoaded",function(){
         
     });
 
-    // sell stock function.
-
+    // Sell stock function.
     let sellBtn = document.getElementById("sellBtn");
 
     sellBtn.addEventListener('click',function(){
@@ -87,7 +104,7 @@ document.addEventListener("DOMContentLoaded",function(){
         dailyProfit(sellName,sellQty);
     });
 
-    // searching stocks from the list
+    // Searching stocks from the list
     let input = document.getElementById('stockSearch');
 
     input.addEventListener('input',function(){
@@ -132,48 +149,50 @@ document.addEventListener("DOMContentLoaded",function(){
         paidAmountSec.classList.add("paid");
     })
 
-    // paiding the money by the person
+    // Paidding the money by the person
     let paidBtn = document.getElementById("OK");
-
     paidBtn.addEventListener("click",function(){
         paidMoney();
         paidAmountSec.classList.remove("paid");
     });
 
+    // Open History Btn
     let his_btn = document.getElementById("his_btn");
-
     his_btn.addEventListener("click",function(){
         let historySec = document.getElementById("historySec");
         historySec.classList.add("history");
 
     });
 
+    // CLose History Btn
     let closeHistory = document.getElementById("closeHistory");
-
     closeHistory.addEventListener("click",function(){
         let historySec = document.getElementById("historySec");
         historySec.classList.remove("history");
     });
 
+    // Toggle Delete Section
     let deleteBtn = document.getElementById("deleteBtn");
     deleteBtn.addEventListener("click",function(){
         let delPersonSec = document.getElementById("delPersonSec");
         delPersonSec.classList.add("del");
     });
 
+    // Delete Person from udhaar and udhaar history and Close the Delete Section
     let okay = document.getElementById("okay");
     okay.addEventListener("click",function(){
         let delName = document.getElementById("delName").value.trim();
         deleteUdhaar(delName);
         deleteHistory(delName);
+        delUdhaarProfitHistory(delName);
         let delPersonSec = document.getElementById("delPersonSec");
         delPersonSec.classList.remove("del");
     });
 
+    // Search person in Udhaar List
     let udhaarSearch = document.getElementById("udhaarSearch");
     udhaarSearch.addEventListener("input",function(){
         let udhaarName = document.getElementById("udhaarSearch").value.trim();
-
         if(udhaarName.length > 0){
             showPerson(udhaarName);
         }else{
@@ -181,8 +200,8 @@ document.addEventListener("DOMContentLoaded",function(){
         }
     });
 
+    // Search person in Udhaar History
     let searchHistory = document.getElementById("searchHistory");
-
     searchHistory.addEventListener("input",function(){
         let inputValue = document.getElementById("searchHistory").value.trim();
         if(inputValue.length > 0){
@@ -192,6 +211,7 @@ document.addEventListener("DOMContentLoaded",function(){
         }
     });
 
+    // Adding expense 
     let addExpenseBtn = document.getElementById("addExpenseBtn");
     addExpenseBtn.addEventListener("click",function(){
         let expenseAmount = parseInt(document.getElementById("expenseAmount").value);
@@ -199,15 +219,18 @@ document.addEventListener("DOMContentLoaded",function(){
         document.getElementById("expenseAmount").value ="";
     })
     
-
+    // Starting Functions at open or  on refresh
     window.onload = function(){
         getAllInventory();
         lowStocksPopup();
         updateUdhaarTable();
         updateUdhaarHistoryTable();
-        showProfit();
+        showDailyProfit();
         calculateMonthlyProfit();
         cleanupDailyProfit();
+        showNetProfit();
+        autoDeleteZeroStock();
+        cleanupYearlyMonthlyProfit();
     };
 
     
@@ -222,8 +245,6 @@ document.addEventListener("DOMContentLoaded",function(){
             Sp : parseInt(document.getElementById('sp').value),
             status:""
         }
-            
-        // console.log(inventory);
         document.getElementById('name').value = "";
         document.getElementById('qty').value = "";
         document.getElementById('cp').value = "";
@@ -238,6 +259,7 @@ document.addEventListener("DOMContentLoaded",function(){
 
     // adding or updating stocks in database.
     function addOrUpdateStock(item){
+        // taking transaction permission from db 
         let tx = db.transaction("inventory", "readwrite");
         let store = tx.objectStore("inventory");
 
@@ -255,31 +277,29 @@ document.addEventListener("DOMContentLoaded",function(){
                 store.put(item);
             }
         };
-
         store.put(item);
+        getAllInventory();
     }
 
-    //getting all the data of stocks from database.
+    //Getting all the data of stocks from database.
     function getAllInventory(){
         let tx = db.transaction("inventory","readonly");
         let store = tx.objectStore("inventory");
 
         let request = store.getAll();
-
         request.onsuccess = (e) =>{
             let items = e.target.result;
             renderInventoryTable(items);
         };
     }
 
-    // show the stock list in the table
+    // Show the stock list in the table
     function renderInventoryTable(item){
         let tbody = document.getElementById('stockTable');
         tbody.innerHTML = "";
 
         item.forEach(item => {
             let row = document.createElement('tr');
-
             row.innerHTML = `
             <td>${item.name}</td>
             <td>${item.Qty}</td>
@@ -288,11 +308,10 @@ document.addEventListener("DOMContentLoaded",function(){
             <td>${item.status}</td>`;
 
             tbody.appendChild(row);
-
         });
     }
 
-     // search item from Stock list function.
+     // Search item from Stock list function.
     function searchItem(name){
         let stockList = document.getElementById('stockTable'); 
 
@@ -312,37 +331,11 @@ document.addEventListener("DOMContentLoaded",function(){
                     <td>${item.Sp}</td>
                     <td>${item.status}</td>
                 </tr>`
-            stockList.innerHTML = row;
-            
+            stockList.innerHTML = row;   
         }
     }
 
-    function lowStocksPopup(){
-        let tx = db.transaction("inventory","readonly");
-        let store = tx.objectStore("inventory");
-
-        let request = store.getAll();
-
-        let item = {};
-        request.onsuccess = (e) =>{
-            item = e.target.result;
-
-            let lowStockList = document.getElementById('lowStockList');
-            lowStockList.innerHTML = "";
-
-            item.forEach(item => {
-            let li = document.createElement('li');
-            if(item.status === "low"){
-                li.innerHTML = item.name + " " + ":" + " " + item.status;
-            }
-            lowStockList.appendChild(li);
-            });
-        }
-    }
-    
-
-
-    // //sell item function.
+    //Sell item function.
     function addSellQty(name,qty){
         let item = {
             name:name,
@@ -361,13 +354,39 @@ document.addEventListener("DOMContentLoaded",function(){
         } 
         document.getElementById("sellName").value = "";
         document.getElementById("sellQty").value = "";
+        autoDeleteZeroStock();
+    }
+
+    // Auto Delete When Stock Will be 0.
+    function autoDeleteZeroStock(){
+
+        let tx = db.transaction("inventory", "readwrite");
+        let store = tx.objectStore("inventory");
+
+        let req = store.getAll();
+
+        req.onsuccess = (e) => {
+            let items = e.target.result;
+
+            items.forEach(item => {
+                if(Number(item.Qty) <= 0){
+                    store.delete(item.name);
+                }
+            });
+            getAllInventory();
+        };
+
+        tx.onerror = () => {
+            console.error("Auto delete zero stock failed");
+        };
     }
 
 
-   
 
-    // udhaar adding function.
+    // Udhaar Adding function.
     function addUdhaar(){
+
+        // Taking Value From The table
         let productname = document.getElementById("productname").value.trim();
         let udhaarQty = document.getElementById("udhaarQty").value;
         let person = {
@@ -377,12 +396,13 @@ document.addEventListener("DOMContentLoaded",function(){
             remaining: 0,
             date : new Date().toLocaleDateString()
         }
-        
+
+        // If Any Fields Are Blank Return
         if(person.name === "" || isNaN(person.amount)){
             alert("Please Inter the value");
             return;
         }else{
-            updateUdhaarList(person);
+            updateUdhaarDB(person);
         }
         addUdhaarHistory(person.name,person.amount);
         udhaarProfit(person.name,productname,udhaarQty);
@@ -391,10 +411,23 @@ document.addEventListener("DOMContentLoaded",function(){
         document.getElementById("udhaarQty").value="";
         document.getElementById('udhaarName').value="";
         document.getElementById('udhaarAmount').value="";
+
+        let tx = db.transaction("inventory","readwrite");
+        let store = tx.objectStore("inventory");
+
+        let  req = store.get(productname);
+        req.onsuccess=(e)=>{
+
+            let item = e.target.result;
+
+            item.Qty -= udhaarQty;
+            store.put(item);
+            getAllInventory();
+        }
     }
 
-    // updating udhaar list in the database
-    function updateUdhaarList(person){
+    // Updating Udhaar List In The Database
+    function updateUdhaarDB(person){
         let tx = db.transaction("udhaar","readwrite");
         let store = tx.objectStore("udhaar");
 
@@ -419,97 +452,41 @@ document.addEventListener("DOMContentLoaded",function(){
             updateUdhaarTable();
             updateUdhaarHistoryTable();
         };
-       
     }
 
-    function deleteHistory(name){
-        let tx = db.transaction("udhaarHistory","readwrite");
-        let store = tx.objectStore("udhaarHistory");
+    // Updating Udhaar List In The Table
+    function updateUdhaarTable(){
+        if (!db) return;
+
+        let tx = db.transaction("udhaar", "readonly");
+        let store = tx.objectStore("udhaar");
 
         let request = store.getAll();
-        request.onsuccess=(e)=>{
-            let item = e.target.result;
 
-            item.forEach(item =>{
-                if(item.name === name){
-                    store.delete(item.id);
-                }
-            })
-        }
-    }
+        request.onsuccess = (e) => {
+            let items = e.target.result;
+            let udhaarTable = document.getElementById("udhaarTable");
+            udhaarTable.innerHTML = "";
 
-    // showing the udhaar list
-    function updateUdhaarTable(){
-    if (!db) return;
-
-    let tx = db.transaction("udhaar", "readonly");
-    let store = tx.objectStore("udhaar");
-
-    let request = store.getAll();
-
-    request.onsuccess = (e) => {
-        let items = e.target.result;
-        let udhaarTable = document.getElementById("udhaarTable");
-        udhaarTable.innerHTML = "";
-
-        if (!items || items.length === 0) {
-            udhaarTable.innerHTML = `<tr><td colspan="5">No Udhaar Found</td></tr>`;
-            return;
-        }
-
-        items.forEach(item => {
-            let row = document.createElement("tr");
-            row.innerHTML = `
-                <td>${item.name}</td>
-                <td>${item.amount}</td>
-                <td>${item.paid}</td>
-                <td>${item.remaining}</td>
-                <td>${item.date}</td>`;
-            udhaarTable.appendChild(row);
-        });
-    };
-    }
-
-    //paid money function
-    function paidMoney(){
-        let inputName = document.getElementById("paidName").value.trim();
-        let inputAmount = parseInt(document.getElementById("paidAmount").value);
-
-        let tx = db.transaction("udhaar","readwrite");
-        let store = tx.objectStore("udhaar");
-
-        let request = store.get(inputName);
-
-        request.onsuccess = (e)=>{
-            let item = e.target.result;
-
-            if(item){
-                item.paid = inputAmount;
-                item.remaining -= inputAmount;
-
-                store.put(item);
-                addUdhaarHistory(inputName);
-                updateUdhaarTable();
-                updateUdhaarHistoryTable();
-                calculateNetProfit(inputName,inputAmount);
+            if (!items || items.length === 0) {
+                udhaarTable.innerHTML = `<tr><td colspan="5">No Udhaar Found</td></tr>`;
+                return;
             }
-        }
-        
-    }
 
-    // deleting the person from the udhar list
-    function deleteUdhaar(name){
-
-        let tx = db.transaction("udhaar", "readwrite");
-        let store = tx.objectStore("udhaar");
-
-        store.delete(name);
-
-        tx.oncomplete = () => {
-            updateUdhaarTable();
+            items.forEach(item => {
+                let row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${item.name}</td>
+                    <td>${item.amount}</td>
+                    <td>${item.paid}</td>
+                    <td>${item.remaining}</td>
+                    <td>${item.date}</td>`;
+                udhaarTable.appendChild(row);
+            });
         };
     }
-
+    
+    //  Searching Persons In Udhaar List
     function showPerson(name){
         let udhaarTable = document.getElementById("udhaarTable");
         udhaarTable.innerHTML = "";
@@ -521,7 +498,6 @@ document.addEventListener("DOMContentLoaded",function(){
 
         request.onsuccess =(e)=>{
             item = e.target.result;
-
             let row = `
             <tr>
             <td>${item.name}</td>
@@ -536,6 +512,7 @@ document.addEventListener("DOMContentLoaded",function(){
         }
     }
 
+    // Adding Udhaar History In Udhaar History DB
     function addUdhaarHistory(name,amount){
         let ut = db.transaction("udhaar","readonly");
         let st = ut.objectStore("udhaar");
@@ -566,7 +543,6 @@ document.addEventListener("DOMContentLoaded",function(){
                     date: new Date().toLocaleDateString()
                 }
             }
-            
             let addReq = store.add(History);
 
             addReq.onerror = () => {
@@ -646,7 +622,77 @@ document.addEventListener("DOMContentLoaded",function(){
         };
     }
 
-    function dailyProfit(name, qty) {
+    // Deleting the person from the udhar list
+    function deleteUdhaar(name){
+
+        let tx = db.transaction("udhaar", "readwrite");
+        let store = tx.objectStore("udhaar");
+
+        store.delete(name);
+
+        tx.oncomplete = () => {
+            updateUdhaarTable();
+        };
+    }
+
+    // Deleting Udhaar History From DB.
+    function deleteHistory(name){
+        let tx = db.transaction("udhaarHistory","readwrite");
+        let store = tx.objectStore("udhaarHistory");
+
+        let request = store.getAll();
+        request.onsuccess=(e)=>{
+            let item = e.target.result;
+
+            item.forEach(item =>{
+                if(item.name === name){
+                    store.delete(item.id);
+                }
+            });
+            updateUdhaarHistoryTable();
+        }
+    }
+    
+    function delUdhaarProfitHistory(name){
+        let tx = db.transaction("udhaarProfit","readwrite");
+        let store = tx.objectStore("udhaarProfit");
+
+        let request = store.get(name);
+        request.onsuccess=(e)=>{
+            let item = e.target.result;
+                 store.delete(item.name);
+        }
+            
+    }
+
+    //Paid Money Function
+    function paidMoney(){
+        let inputName = document.getElementById("paidName").value.trim();
+        let inputAmount = parseInt(document.getElementById("paidAmount").value);
+
+        let tx = db.transaction("udhaar","readwrite");
+        let store = tx.objectStore("udhaar");
+
+        let request = store.get(inputName);
+
+        request.onsuccess = (e)=>{
+            let item = e.target.result;
+
+            if(item){
+                item.paid = inputAmount;
+                item.remaining -= inputAmount;
+
+                store.put(item);
+                addUdhaarHistory(inputName);
+                updateUdhaarTable();
+                updateUdhaarHistoryTable();
+                calculateNetProfit(inputName,inputAmount);
+            }
+        }
+    }
+
+    // Calculating Daily Profit.
+    function dailyProfit(name,qty){
 
         let today = new Date().toLocaleDateString("en-GB");
 
@@ -659,7 +705,7 @@ document.addEventListener("DOMContentLoaded",function(){
             let stock = e.target.result;
             if (!stock) return;
 
-            let profit = (stock.Sp - stock.Cp) * qty;
+            let profit = (stock.Sp - stock.Cp) * qty; // calculating profit
 
             let dpTx = db.transaction("dailyProfit", "readwrite");
             let dpStore = dpTx.objectStore("dailyProfit");
@@ -679,12 +725,13 @@ document.addEventListener("DOMContentLoaded",function(){
                     });
                 }
             };
-            showProfit();
+            showDailyProfit();
             calculateMonthlyProfit();
         };
     }
 
-    function showProfit(){
+    // Showing Daily Profit In The UI
+    function showDailyProfit(){
         let oneDayProfit = document.getElementById("oneDayProfit");
         oneDayProfit.innerHTML = "";
 
@@ -706,8 +753,37 @@ document.addEventListener("DOMContentLoaded",function(){
         };
     }
 
-    
+    // Deleting The Last Month All Days Profit
+    function cleanupDailyProfit(){
+
+        let today = new Date();
+        let currentMonth = today.getMonth() + 1;
+        let currentYear  = today.getFullYear();
+
+        let tx = db.transaction("dailyProfit", "readwrite");
+        let store = tx.objectStore("dailyProfit");
+
+        let req = store.getAll();
+
+        req.onsuccess = (e) => {
+            let items = e.target.result;
+
+            items.forEach(item => {
+                
+                let parts = item.date.split("/");
+                let itemMonth = parseInt(parts[1]);
+                let itemYear  = parseInt(parts[2]);
+
+                if(itemMonth !== currentMonth || itemYear !== currentYear){
+                    store.delete(item.date);
+                }
+            });
+        };
+    }
+
+    // Calculating Monthly Profit And Saving In Monthly Profit DB
     function calculateMonthlyProfit(expense){
+
         let today = new Date();
         let monthKey = String(today.getMonth() + 1).padStart(2, "0") + "-" + today.getFullYear();
 
@@ -715,12 +791,14 @@ document.addEventListener("DOMContentLoaded",function(){
         let dailyStore = tx.objectStore("dailyProfit");
         let monthlyStore = tx.objectStore("monthlyProfit");
 
+        // Getting All Daily Profit From Database. 
         let dailyReq = dailyStore.getAll();
 
         dailyReq.onsuccess = (e) => {
             let dailyItems = e.target.result;
             let monthlyTotal = 0;
-
+            
+            // Running Loop On All Data Of Daily Profit
             dailyItems.forEach(item => {
                 let parts = item.date.split("/"); // DD/MM/YYYY
                 let itemMonth = Number(parts[1]);
@@ -734,9 +812,11 @@ document.addEventListener("DOMContentLoaded",function(){
                 }
             });
 
+            // Getting Key Data From Monthly DB
             let monthReq = monthlyStore.get(monthKey);
 
             monthReq.onsuccess = (ev) => {
+
                 let monthData = ev.target.result;
                 let safeExpense = Number(expense || 0);
 
@@ -744,13 +824,13 @@ document.addEventListener("DOMContentLoaded",function(){
 
                 if(monthData){
                     monthData.profit  = monthlyTotal;
-                    monthData.expense = Number(monthData.expense || 0) + safeExpense;
+                    monthData.expense += Number(expense || 0)
                     monthlyStore.put(monthData);
                 } else {
                     monthlyStore.add({
                         month: monthKey,
                         profit: monthlyTotal,
-                        expense: safeExpense
+                        expense: 0
                     });
                 }
 
@@ -760,38 +840,44 @@ document.addEventListener("DOMContentLoaded",function(){
         };
     }
 
+    //  Delete Last Year ALL Monthly Profit.
+    function cleanupYearlyMonthlyProfit(){
 
+        let currentYear = new Date().getFullYear();
+
+        let tx = db.transaction("monthlyProfit", "readwrite");
+        let store = tx.objectStore("monthlyProfit");
+
+        let req = store.getAll();
+
+        req.onsuccess = (e) => {
+            let items = e.target.result;
+
+            items.forEach(item => {
+                if(!item.month) return;
+
+                // month format: MM-YYYY
+                let parts = item.month.split("-");
+                let itemYear = Number(parts[1]);
+
+                if(itemYear < currentYear){
+                    store.delete(item.month);
+                }
+            });
+        };
+
+        tx.onerror = () => {
+            console.error("Yearly monthlyProfit cleanup failed");
+        };
+    }
+
+    // Showing Monthly In UI
     function showMonthlyProfit(amount){
         let el = document.getElementById("oneMonthProfit");
         el.innerText = "₹ " + amount;
     }
 
-    function getMonthKey() {
-        let today = new Date();
-
-        let month = String(today.getMonth() + 1).padStart(2, "0");
-
-        let year = today.getFullYear();
-
-        return month + "-" + year;
-    }
-
-    function netProfit(){
-        let OneMonthNetProfit = document.getElementById("OneMonthNetProfit");
-        OneMonthNetProfit.innerHTML = "";
-        let month = getMonthKey();
-
-        let tx = db.transaction("monthlyProfit","readonly");
-        let store = tx.objectStore("monthlyProfit");
-
-        let req = store.get(month);
-        req.onsuccess=(e)=>{
-            let item = e.target.result;
-            let netProfit = item.profit - item.expense;
-            OneMonthNetProfit.innerHTML = netProfit;
-        }
-    }
-
+    // Calculating Udhaar Profit.
     function udhaarProfit(name, productname, qty){
 
         if(!name || !productname || !qty){
@@ -810,7 +896,6 @@ document.addEventListener("DOMContentLoaded",function(){
                 console.log("Stock not found");
                 return;
             }
-
             let profit = (Number(stock.Sp) - Number(stock.Cp)) * Number(qty);
 
             let tx = db.transaction("udhaarProfit", "readwrite");
@@ -831,44 +916,204 @@ document.addEventListener("DOMContentLoaded",function(){
                     });
                 }
             };
-
-            tx.oncomplete = () => console.log("udhaarProfit saved");
             tx.onerror = (e) => console.log("TX error", e);
         };
     }
 
-    function calculateNetProfit(name, amount){
+    // Calculating Net Profit Of current Month
+    function netProfit(){
+        let today = new Date();
+        let month = String(today.getMonth() + 1).padStart(2, "0") + "-" + today.getFullYear();
 
-        let profitEl = document.getElementById("OneMonthNetProfit");
+        // Open transaction
+        let tx = db.transaction(["monthlyProfit", "netProfit"], "readwrite");
 
-        let netProfit = Number(profitEl.innerText.replace("₹","").trim()) || 0;
+        let monthlyStore = tx.objectStore("monthlyProfit");
+        let netStore     = tx.objectStore("netProfit");
 
-        let tx = db.transaction("udhaarProfit","readwrite");
-        let store = tx.objectStore("udhaarProfit");
-
-        let req = store.get(name);
+        //  Getting Particular Month Data.
+        let req = monthlyStore.get(month);
 
         req.onsuccess = (e) => {
             let item = e.target.result;
             if(!item) return;
 
-            amount = Number(amount);
-            item.profit = Number(item.profit) || 0;
+            // First get existing netProfit for this month
+            let netReq = netStore.get(month);
 
-            if(amount >= item.profit){
-                netProfit += item.profit;
-                item.profit = 0;
-                store.put(item);
-                profitEl.innerText = "₹ " + netProfit;
-            } else {
-                netProfit += amount;
-                item.profit -= amount;
-                store.put(item);
-                profitEl.innerText = "₹ " + netProfit;
+            netReq.onsuccess = (ev) => {
+                let data = ev.target.result;
+
+                if(data){
+                    // Update existing
+                    data.netProfit = Number(item.profit || 0) - Number(item.expense || 0);
+                    netStore.put(data);
+                } else {
+                    // Add new
+                    netStore.put({
+                        month: month,
+                        netProfit: Number(item.profit || 0) - Number(item.expense || 0),
+                        udhaarProfit:0
+                    });
+                }
+            };
+
+            // showNetProfit should run after transaction complete**
+            tx.oncomplete = () => {
+                showNetProfit();
+            };
+
+            tx.onerror = (err) => {
+                console.error("Transaction failed:", err);
+            };
+        };
+    }
+
+    // Calculating Total Actual Realised Profit .
+    function calculateNetProfit(name, amount) {
+
+        amount = Number(amount);
+
+        let today = new Date();
+        let month = String(today.getMonth() + 1).padStart(2, "0") + "-" + today.getFullYear();
+
+        // transaction for udhaarProfit and netProfit
+        let tx = db.transaction(
+            ["udhaarProfit", "netProfit"],
+            "readwrite"
+        );
+
+        let udhaarStore = tx.objectStore("udhaarProfit");
+        let netStore    = tx.objectStore("netProfit");
+
+        // Step 1: Get udhaar profit
+        let req = udhaarStore.get(name);
+
+        req.onsuccess = (e) => {
+            let item = e.target.result;
+            if (!item) return;
+
+            let udhaarProfit = Number(item.profit || 0);
+            if(udhaarProfit <= 0){
+
+                let netReq = netStore.get(month);
+                netReq.onsuccess = (ev) => {
+                    let netItem = ev.target.result;
+
+                        netItem.netProfit = Number(netItem.netProfit || 0) +  Number(netItem.udhaarProfit || 0);
+                        netStore.put(netItem);
+                };
+                showNetProfit();
+            }else{
+                let realisedProfit = 0;
+
+                if (amount >= udhaarProfit) {
+                    realisedProfit = udhaarProfit;
+                    item.profit = 0;
+                } else {
+                    realisedProfit = amount;
+                    item.profit = udhaarProfit - amount;
+                }
+
+                // update remaining udhaar profit
+                udhaarStore.put(item);
+
+                // Step 2: add realised udhaar profit to existing netProfit in DB
+                let netReq = netStore.get(month);
+
+                netReq.onsuccess = (ev) => {
+                    let netItem = ev.target.result;
+
+                        netItem.netProfit = Number(netItem.netProfit || 0);
+                        netItem.udhaarProfit += realisedProfit;
+                        netStore.put(netItem);
+                };
+                showNetProfit();
             }
         };
     }
 
+    // Showing Total profit In UI.
+    function showNetProfit(){
+
+        let today = new Date();
+        let month = String(today.getMonth() + 1).padStart(2, "0") + "-" + today.getFullYear();
+        let profitEl = document.getElementById("OneMonthNetProfit");
+
+        let tx = db.transaction("netProfit", "readonly");
+        let store = tx.objectStore("netProfit");
+
+        let req = store.get(month);
+
+        req.onsuccess = (e) => {
+            let item = e.target.result;
+
+            if(item){
+                let totalProfit = Number(item.netProfit || 0) + Number(item.udhaarProfit || 0)
+                profitEl.innerText = "₹ " + Number(totalProfit || 0);
+            } else {
+                profitEl.innerText = "₹ 0";
+            }
+        };
+    }
+
+    //  Deleting Last Year All Month Total Profit.
+    function cleanupYearlyNetProfit(){
+
+        let currentYear = new Date().getFullYear();
+
+        let tx = db.transaction("netProfit", "readwrite");
+        let store = tx.objectStore("netProfit");
+
+        let req = store.getAll();
+
+        req.onsuccess = (e) => {
+            let items = e.target.result;
+
+            items.forEach(item => {
+                if(!item.month) return;
+
+                // month format: MM-YYYY
+                let parts = item.month.split("-");
+                let itemYear = Number(parts[1]);
+
+                if(itemYear < currentYear){
+                    store.delete(item.month);
+                }
+            });
+        };
+
+        tx.onerror = () => {
+            console.error("NetProfit yearly cleanup failed");
+        };
+    }
+
+    
+    // Popup Low Stock Function
+    function lowStocksPopup(){
+        let tx = db.transaction("inventory","readonly");
+        let store = tx.objectStore("inventory");
+
+        let request = store.getAll();
+
+        let item = {};
+        request.onsuccess = (e) =>{
+            item = e.target.result;
+
+            let lowStockList = document.getElementById('lowStockList');
+            lowStockList.innerHTML = "";
+
+            item.forEach(item => {
+            let li = document.createElement('li');
+            if(item.status === "low"){
+                li.innerHTML = item.name + " " + ":" + " " + item.status;
+            }
+            lowStockList.appendChild(li);
+            });
+        }
+    }
+
+    //  Backup All Database From the DB
     function backupDatabase(){
 
         if(!db){
@@ -897,13 +1142,13 @@ document.addEventListener("DOMContentLoaded",function(){
                     downloadBackupFile(backupData);
                 }
             };
-
             request.onerror = () => {
                 console.error("Error reading store:", storeName);
             };
         });
     }
 
+    // Downloading that Backup File
     function downloadBackupFile(data){
 
         let jsonData = JSON.stringify(data, null, 2);
@@ -926,6 +1171,7 @@ document.addEventListener("DOMContentLoaded",function(){
         URL.revokeObjectURL(url);
     }
 
+    //  Restoring Data From the System
     function restoreDatabase(){
 
         let fileInput = document.getElementById("restoreFile");
@@ -970,33 +1216,5 @@ document.addEventListener("DOMContentLoaded",function(){
                 alert("Restore failed ");
             };
         };
-
         reader.readAsText(file);
-    }
-
-    function cleanupDailyProfit(){
-
-        let today = new Date();
-        let currentMonth = today.getMonth() + 1;
-        let currentYear  = today.getFullYear();
-
-        let tx = db.transaction("dailyProfit", "readwrite");
-        let store = tx.objectStore("dailyProfit");
-
-        let req = store.getAll();
-
-        req.onsuccess = (e) => {
-            let items = e.target.result;
-
-            items.forEach(item => {
-                
-                let parts = item.date.split("/");
-                let itemMonth = parseInt(parts[1]);
-                let itemYear  = parseInt(parts[2]);
-
-                if(itemMonth !== currentMonth || itemYear !== currentYear){
-                    store.delete(item.date);
-                }
-            });
-        };
     }
